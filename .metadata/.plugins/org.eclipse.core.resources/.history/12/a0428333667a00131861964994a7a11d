@@ -1,0 +1,15 @@
+package ej1;
+
+public class Test {
+
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		ChainHashTable<String, String> tabla = new ChainHashTable<String, String>(5); //tama–o inicial 5
+		Pair par = new PairData("k", "v");
+		tabla.addEntry(par);
+		
+	}
+
+}

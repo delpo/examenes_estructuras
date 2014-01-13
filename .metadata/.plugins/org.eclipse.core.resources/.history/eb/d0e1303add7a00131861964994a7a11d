@@ -1,0 +1,341 @@
+package ej1;
+
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Set;
+
+public class ChainHashTable<K,V> implements HashTable<K, V> {
+	private static int INITIAL_SIZE = 100;
+	private static double LOAD_FACTOR = 2.0;
+	
+	 static class Node<K,V> {
+		Pair<K,V> info = null;
+		Node<K,V> next = null;
+		public int count = 1; //adapt
+		
+		public Node(Pair<K,V> elem, Node<K,V> next) {
+			info = elem;
+			this.next = next;
+		}
+	}
+	
+	private Node<K,V>[] table;
+	private int size = 0;
+	private int unique = 0; //adapt	
+	
+	private Node<K,V> findInList(Node<K,V> first, K key) {
+		Node<K,V> aux = first;
+		
+		if (aux.info.getKey().equals(key))
+			return null;
+		else 
+			while(aux.next != null && !aux.next.info.getKey().equals(key))
+				aux = aux.next;
+		return aux;
+	}
+	/////////////////////////////////////////////////////////////////////////////////
+	@SuppressWarnings("unchecked")
+	private boolean rehash() {
+		if ((double)size >= ((double)table.length*LOAD_FACTOR)) {
+			Node<K,V> [] oldTable = table;
+			
+			table = new Node[oldTable.length*2];
+			
+			for (int i = 0; i < oldTable.length; i++) {
+				while (oldTable[i] != null) {
+					Node<K,V> aux =  oldTable[i];
+					oldTable[i] = oldTable[i].next;
+					
+					int index = aux.info.getKey().hashCode()%table.length;
+					aux.next = table[index];
+					table[index] = aux;
+				}
+					
+			}
+			return true;
+		}
+		
+		return false;
+	}
+	/////////////////////////////////////////////////////////////////////////////////
+	
+	
+	@SuppressWarnings("unchecked")
+	public ChainHashTable() {
+		table = new Node[INITIAL_SIZE];
+		size = 0;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public ChainHashTable(int initial_size) {
+		table = new Node[initial_size];
+		size = 0;
+	}
+	
+	
+	/////////////////////////////////////////////////////////////////////////////////
+	
+	private boolean nullEntry(Pair<K,V> entry) {
+        return entry.getKey() == null && entry.getValue() == null;
+	}
+	/*
+	public Pair<K, V> addEntry(Pair<K,V> entry) {
+		rehash();
+		
+		int index = entry.getKey().hashCode()%table.length;
+		Pair<K,V> old = null;
+
+		
+		if (table[index] == null) {
+			table[index] = new Node<K,V>(entry, null);
+			size++;
+			return null;
+		}
+			
+		Node<K,V> prev = findInList(table[index], entry.getKey());			
+			
+		if (prev == null) {
+			old = table[index].info;
+			table[index].info = entry;
+		}
+		else if (prev.next == null) {
+			prev.next = new Node<K,V>(entry, null);
+			size ++;
+		} else {
+			prev.next.info = entry;
+			old = prev.next.info;
+		}
+		
+		
+		return old;
+	}
+	*/
+	public Pair<K,V> addEntry(Pair<K,V> entry) {                
+        int pos = Math.abs(entry.getKey().hashCode() % table.length); 
+        int newPos = -1;
+        boolean found = false;
+        
+        while (!found && table[pos] != null) {
+                if (nullEntry(table[pos].info)) {
+                        if (newPos == -1) newPos = pos;
+                        pos = Math.abs((pos +1) % table.length); 
+                } 
+                else if (table[pos].info.getKey().equals(entry.getKey())) 
+                        found = true;
+                else
+                        pos = Math.abs((pos +1) % table.length); 
+        }
+        
+        if (newPos == -1 || found) newPos = pos;
+
+        if (table[newPos] == null) unique++;
+        
+        Pair<K,V> old = found ? table[newPos].info : null;
+        
+        if(!found)
+        	table[newPos] = new Node<K,V>(entry, null);
+        else{
+        	System.out.println("OLD: "+old.getValue());
+        }
+        
+        if (!found) size++;
+
+        rehash();
+        return old;
+	}
+	/////////////////////////////////////////////////////////////////////////////////
+	
+	public Pair<K, V> removeEntry(K key) {
+		int index = key.hashCode()%table.length;
+		Pair<K,V> old = null;
+		
+		if (table[index] == null)
+			return old;
+		
+		Node<K,V> prev = findInList(table[index], key);
+
+		if (prev == null) {
+			old = table[index].info;
+			table[index] = table[index].next;
+			size--;
+		} 
+		else if (prev.next != null) {
+			old = prev.next.info;
+			prev.next = prev.next.next;
+			size --;
+		}	
+
+		return old;
+	}
+
+	public Pair<K, V> getEntry(K key) {
+		int index = key.hashCode()%table.length;
+		
+		if (table[index] == null)
+			return null;
+		
+		Node<K,V> prev = findInList(table[index], key);
+		
+		if (prev == null)
+			return table[index].info;
+		else if (prev.next!= null)
+			return prev.next.info;
+		
+		return null;
+	}
+
+	public boolean isEmpty() {
+		return size == 0;
+	}
+	
+
+	public int size() {
+		return size;
+	}
+	
+	public String toString() {
+		String retValue = "";
+		
+		for (int i =0; i < table.length; i++ ) {
+			if (table[i] != null) {
+				retValue += String.format("[%3d]: ", i); 
+				Node<K,V> aux = table[i];
+				while (aux != null) {
+					retValue += aux.info.toString() + " ";
+					aux = aux.next;
+				}
+				retValue += "\n";
+			}	
+		}
+		
+		retValue += String.format("size: %d out of %d (%.2f %%)\n", size, table.length, ((float)size/(float)table.length) * 100.0);
+		return retValue;
+	}
+	
+	public Set<K> keySet() {
+		Set<K> set = (Set<K>) new HashSet<K>();
+		
+		for (int i = 0; i < table.length; i++) {
+				Node<K,V> aux = table[i];
+			
+				while(aux != null) {
+					set.add(aux.info.getKey());
+					aux = aux.next;
+				}
+		}
+		return set;
+	}
+	
+	public List<Pair<K,V>> entryList() {
+		List<Pair<K,V>> list = new ArrayList<Pair<K,V>>();
+		for (int i = 0; i < table.length; i++) {
+			Node<K,V> aux = table[i];
+		
+			while(aux != null) {
+				list.add(aux.info);
+				aux = aux.next;
+			}
+		}
+		
+		return list;
+	}
+	
+	
+
+	public Iterator<Pair<K, V>> iterator() {
+		return new HashTableIterator();
+	}
+	
+	public class HashTableIterator implements Iterator<Pair<K,V>> {
+		private Node<K, V> next;
+		private Node<K, V> last;
+		
+		private Node<K,V> findNext(Node<K,V> current) {
+			Node<K,V> next = null;
+			if (current == null || current.next == null) {
+				int index = 0;
+				if (current != null)
+					index = (current.info.getKey().hashCode() % table.length)+ 1;
+				
+				while (index < table.length && table[index] == null)
+					index ++;
+				
+				if (index < table.length)
+					next = table[index];
+				else 
+					next = null;
+			}
+			else 
+				next = current.next;  
+			
+			return next;
+		}
+		
+		private HashTableIterator() {
+			next = findNext(null);
+			last = null;
+		}
+		
+		
+		public boolean hasNext() {
+			return next != null;
+		}
+		public Pair<K, V> next() throws NoSuchElementException {
+			if (!hasNext()) 
+				throw new NoSuchElementException();
+			
+			last = next;
+			next = findNext(next);
+			return last.info;
+		}
+		public void remove() {
+			if (last == null)
+				throw new IllegalStateException();
+			
+			int index = last.info.getKey().hashCode() % table.length;
+			if (table[index] == last)
+				table[index] = last.next;
+			else {
+				Node<K,V> aux = table[index];
+				while (aux.next != last) 
+					aux = aux.next;
+				aux.next = last.next;
+			}
+			size--;
+			last = null;
+		}
+		
+		public String toString() {
+			String retValue = "";
+			
+			if (next == null)
+				retValue += "Next [<>]";
+			else {
+				int index = next.info.getKey().hashCode() % table.length;
+				retValue += String.format("Next [I:%d %s]", index, next.info.toString()); 
+			}
+			
+			if (last == null)
+				retValue += " Last [<>]";
+			else {
+				int index = last.info.getKey().hashCode() % table.length;
+				retValue += String.format(" Last [I:%d %s]", index, last.info.toString()); 
+			}
+				
+			return retValue;
+		}
+
+	}
+
+	@Override
+	public void clear() {
+		for (int i =0; i < table.length; i++)
+			table[i] = null;
+		
+		size = 0; 
+	}
+}

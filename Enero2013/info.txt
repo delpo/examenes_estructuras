@@ -1,0 +1,10 @@
+5
+Castell—
+Grao
+Almassora
+Borriana
+Vila-real
+3 Grao 3.7 Almassora 2.5 Vila-real 3.9 1 Almassora 6.1
+1 Borriana 5.2
+0
+2 Almassora 1.8 Borriana 4.1

@@ -1,0 +1,453 @@
+package ej3;
+
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
+
+public class DoubleLinkedList<T> implements List<T> {
+	/** Implementation of the circular Double linked List
+	 * 
+	 * @author Antonio Morales
+	 *
+	 * @param <T>
+	 * 
+	 * interface List implemented using double linked nodes chained in a cicular list.
+	 * NOTE: Iterators not implemented.  
+	 */
+	
+	
+	// Node declaration
+	protected static class Node<T> {
+		public T data;
+		public Node<T> next;
+		public Node<T> prev;
+		
+		public Node(T element) {
+			data = element;
+			next = null;
+			prev = null;
+		}
+		
+		 Node(T element, Node<T> prevRef, Node<T> nextRef) {
+			data = element;
+			next = nextRef;
+			prev = prevRef;
+		}
+	}
+	
+	// private data
+	protected Node<T> head = null;
+	protected int size = 0;
+	
+	protected Node<T> indexNode(int index) {
+		// Search a node by index. Does not check index range
+		Node<T> ref = head;
+		
+		if (head != null) {
+			int i; 
+			if (index < (size/2))
+				for (i=0; i < index; i++)
+					ref = ref.next;
+			else
+				for (i=size; i > index; i--)
+					ref = ref.prev;
+		}
+		return ref;
+	}
+	
+	protected void removeNode(Node<T> node) {
+		// Remove a node from the list. 
+		// Modifies head if needed
+		if (node == head)
+			head = node.next;
+		
+		if (node.next == node) 
+			head = null;
+		else {
+			node.prev.next = node.next;
+			node.next.prev = node.prev;
+		}
+		
+		size--;
+	}
+	
+	protected Node<T> insertAfter(Node<T> node, T value) {
+		// Inserts a new node after the one given 
+		Node<T> newNode = new Node<T>(value);
+		
+		if (head == null) { // The list is empty
+			head = newNode;
+			newNode.next = newNode.prev = newNode;
+		} else {
+			newNode.next = node.next;
+			newNode.prev = node;
+			node.next.prev = newNode;
+			node.next = newNode;
+		}
+		
+		size++;
+		
+		return newNode;
+	}
+	
+	protected Node<T> insertBefore(Node<T> node, T value) {
+		// Inserts a new node after the one given 
+		Node<T> newNode = new Node<T>(value);
+		
+		if (head == null) { // The list is empty
+			head = newNode;
+			newNode.next = newNode.prev = newNode;
+		} else {
+			newNode.prev = node.prev;
+			newNode.next = node;
+			node.prev.next = newNode;
+			node.prev = newNode;
+		}
+		
+		size++;
+		
+		return newNode;
+	}
+	
+	public DoubleLinkedList() {
+		head = null;
+		size = 0;
+	}
+	
+	public DoubleLinkedList(List<T> otherList) {
+		size = 0;
+		head = null;
+	
+		for(int i=0; i < otherList.size() ; i++)
+			add(otherList.get(i));
+		
+	}
+
+	public boolean add(T element) {
+		insertBefore(head, element);
+		return true;
+	}
+
+	public void add(int index, T element) {
+		if (index < 0 ||index > size)
+			throw new IndexOutOfBoundsException(Integer.toString(index));
+		
+		Node<T> node = indexNode(index);
+		
+		insertBefore(node, element);
+		if (index == 0)
+			head = node.prev;
+
+	}
+
+	public void clear() {
+		head = null;
+		size = 0;
+	}
+	
+	public boolean contains(Object element) {
+		Node<T> ref = head;
+		
+		while (ref != null && !ref.data.equals(element))
+			ref = ref.next;
+		
+		return ref != null;
+	}
+
+	public T get(int index) {
+		if (index < 0 || index >= size)
+			throw new IndexOutOfBoundsException(Integer.toString(index));
+		
+		Node<T> ref = indexNode(index);
+		
+		return ref.data;
+	}
+
+	public int indexOf(Object element) {
+		Node<T> ref = head;
+		int index = 0;
+		
+		while (index<size && !ref.data.equals(element)) {
+			ref = ref.next;
+			index++;
+		}
+		
+		if (index<size)
+			return index;
+		else 
+			return -1;
+	}
+
+	public boolean isEmpty() {
+		return head == null;
+	}
+
+	public boolean remove(Object element) {
+		if (isEmpty()) 
+			return false;
+
+		Node<T> ref=head;
+
+		while (!ref.data.equals(element) && (ref.next != head))
+			ref = ref.next;
+		
+		if (ref.data.equals(element))
+			removeNode(ref);
+		
+		return false;
+	}
+
+	public T remove(int index) {
+		if (index < 0 || index >= size)
+			throw new IndexOutOfBoundsException(Integer.toString(index));
+		
+		Node<T> node = indexNode(index);
+		removeNode(node);
+		
+		return node.data;
+	}
+
+	public T set(int index, T element) {
+		if (index < 0 || index >= size)
+			throw new IndexOutOfBoundsException(Integer.toString(index));
+		
+		Node<T> ref = indexNode(index);
+		
+		T oldValue = ref.data;
+		ref.data = element;
+		return oldValue;
+	}
+
+	public int size() {
+		return size; 
+	}
+	
+	public String toString() {
+		
+		String retVal = "[ ";
+		
+		Node<T> current = head;
+		
+		if (current != null)
+		do {
+			retVal += current.data.toString();
+			current = current.next;
+			if (current != head)
+				retVal += ", ";
+			
+		} while(current != head);
+			
+		retVal += " ]: " + size;
+		
+		return retVal;
+	}
+
+	@Override
+	public boolean addAll(Collection<? extends T> c) {
+		Iterator<T> iter = (Iterator<T>) c.iterator();
+		
+		while(iter.hasNext())
+			add(iter.next());
+		
+		return !c.isEmpty();
+	}
+
+	@Override
+	public boolean addAll(int index, Collection<? extends T> c) {
+		if (index < 0 || index > size)
+			throw new IndexOutOfBoundsException(Integer.toString(index));
+		
+		size += c.size();
+		
+		Node<T> node = indexNode(index);
+
+		Iterator<T> iter = (Iterator<T>) c.iterator();
+		
+		if (head == null && iter.hasNext())
+			node = insertBefore(null,iter.next());
+		
+		while(iter.hasNext())
+			insertBefore(node, iter.next());
+		
+		
+		return !c.isEmpty();
+	}
+
+	@Override
+	public boolean containsAll(Collection<?> c) {
+		Iterator<T> iter = (Iterator<T>) c.iterator();
+		while (iter.hasNext())
+			if (!contains(iter.next()))
+				return false;
+		return true;
+	}
+
+	@Override
+	public Iterator<T> iterator() {
+		throw new UnsupportedOperationException("iterator()");
+	}
+
+	@Override
+	public int lastIndexOf(Object o) {
+		Node<T> ref = head;
+		
+		if (head == null)
+			return -1;
+		
+		ref = ref.prev;
+		for (int i = size-1; i >= 0; i--)
+			if (ref.data.equals(o))
+				return i;
+		return -1;
+	}
+
+
+	@Override
+	public ListIterator<T> listIterator() {
+		throw new UnsupportedOperationException("listIterator()");
+
+	}
+
+	@Override
+	public ListIterator<T> listIterator(int index) {
+		throw new UnsupportedOperationException("listIterator(int)");
+	}
+	
+	@Override
+	public boolean removeAll(Collection<?> c) {
+		if (isEmpty())
+			return false;
+				
+		Node<T> ref = head;
+		boolean retValue = false;
+		do {
+			ref = ref.next;
+			if (c.contains(ref.prev.data)) {
+				removeNode(ref.prev);
+				retValue = true;
+			}
+		} while (!isEmpty() && ref != head);
+		
+		return retValue;
+	}
+
+	@Override
+	public boolean retainAll(Collection<?> c) {
+		if (isEmpty())
+			return false;
+				
+		Node<T> ref = head;
+		boolean retValue = false;
+		do {
+			ref = ref.next;
+			if (!c.contains(ref.prev.data)) {
+				removeNode(ref.prev);
+				retValue = true;
+			}
+		} while (!isEmpty() && ref != head);
+		
+		return retValue;
+	}
+
+	@Override
+	public List<T> subList(int fromIndex, int toIndex) {
+		if (fromIndex < 0 || fromIndex >= size || toIndex <= 0 || toIndex >= size || toIndex < fromIndex)
+			throw new IndexOutOfBoundsException();
+		
+		DoubleLinkedList<T> newList = new DoubleLinkedList<T>();
+		
+		Node<T> ref = indexNode(fromIndex);
+		for (int i = fromIndex; i < toIndex; i++) {
+			newList.add(ref.data);
+			ref=ref.next;
+		}
+		
+		return newList;
+	}
+
+	@Override
+	public Object[] toArray() {
+		Object[] newV = new Object[size];
+		
+		Node<T> ref = head;
+		for (int i =0; i < size; i++, ref = ref.next)
+			newV[i] = ref.data;
+			
+		return newV;
+	}
+
+	@Override
+	public <T> T[] toArray(T[] a) {
+		T[] newV = (T []) new Object[size];
+		
+		Node<T> ref = (Node<T>) head;
+		for (int i =0; i < size; i++, ref = ref.next)
+			newV[i] = ref.data;
+			
+		return newV;
+	}
+
+	public void shuffle(DoubleLinkedList<T> lista2) {
+		int length_total = size + lista2.size();
+		//mezcla en this lo que le paso como argumento
+		int cont = 0;
+		for(int i = 0; i < length_total; i++){
+			if(i%2 == 0 && cont < lista2.size()){
+				T d = lista2.get(cont);
+				this.add(i, d);
+				cont++;
+			}
+		}
+	}
+	
+	public void awesomeShuffle(DoubleLinkedList<T> lista2) {
+		int length_total = size + lista2.size();
+		//mezcla en this lo que le paso como argumento
+		int cont = 0;
+		for(int i = 0; i < length_total; i++){
+			if(i%2 == 0 && cont < lista2.size()){
+				T value = lista2.get(cont);
+				///////
+				if (i < 0 ||i > size)
+					throw new IndexOutOfBoundsException(Integer.toString(i));
+				
+				// Search a node by index. Does not check index range
+				Node<T> ref = head;
+				
+				if (head != null) {
+					int j; 
+					if (i < (size/2))
+						for (j=0; j < i; j++)
+							ref = ref.next;
+					else
+						for (j=size; j > i; j--)
+							ref = ref.prev;
+				}
+				Node<T> node =  ref;
+				
+				// Inserts a new node after the one given 
+				Node<T> newNode = new Node<T>(value);
+				
+				if (head == null) { // The list is empty
+					head = newNode;
+					newNode.next = newNode.prev = newNode;
+				} else {
+					System.out.println("node.prev: "+node.prev.toString());
+					newNode.prev = node.prev;
+					newNode.next = node;
+					node.prev.next = newNode;
+					node.prev = newNode;
+				}
+				
+				size++;
+				
+				if (i == 0)
+					head = node.prev;
+				///////
+				cont++;
+			}
+		}
+	}
+
+}

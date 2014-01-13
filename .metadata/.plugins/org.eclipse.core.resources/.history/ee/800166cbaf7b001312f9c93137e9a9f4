@@ -1,0 +1,7 @@
+package ej3;
+
+public class Bloque {
+	public int inicio;
+	public int fin;
+	
+}

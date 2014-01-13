@@ -1,0 +1,11 @@
+package ej3;
+
+public class GestorMemoria {
+	public int cantidad;
+	LinkedList memoria;
+	
+	public GestorMemoria(int cantidad){
+		this.cantidad = cantidad;
+	}
+
+}

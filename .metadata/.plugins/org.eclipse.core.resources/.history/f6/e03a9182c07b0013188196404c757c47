@@ -1,0 +1,50 @@
+package ej4;
+
+import java.util.LinkedList;
+import java.util.List;
+import java.util.PriorityQueue;
+
+public class Ejercicio {
+	
+	public static void mostrarArbolMayorAMenor(EDBinaryTree<Integer> a){
+		List<Integer> myList = new LinkedList<Integer>();
+		PriorityQueue<Integer> cola = new PriorityQueue<Integer>();
+		cola.add(1);
+		cola.add(28);
+		cola.add(2);
+		int size = cola.size();
+		LinkedList<Integer> list = new LinkedList<Integer>();
+		for(int i = 0; i < size; i++){
+			int myel = cola.poll();
+			list.add(myel);
+		}
+		for(int i = size-1; i >= 0; i--){
+			System.out.println(list.get(i));
+		}
+	}
+
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		EDBinaryTree<Integer> b = new EDBinaryTree<Integer>(32);
+		EDBinaryTree<Integer> a = new EDBinaryTree<Integer>(14);
+		EDBinaryTree<Integer> hijoizqizq = new EDBinaryTree<Integer>(6, null, a);
+		EDBinaryTree<Integer> hijoizq = new EDBinaryTree<Integer>(17, hijoizqizq, b);
+		
+		
+		EDBinaryTree<Integer> c = new EDBinaryTree<Integer>(88);
+		EDBinaryTree<Integer> d = new EDBinaryTree<Integer>(54);
+		EDBinaryTree<Integer> e = new EDBinaryTree<Integer>(82);
+		EDBinaryTree<Integer> hijoderizq = new EDBinaryTree<Integer>(65, d, e);
+		EDBinaryTree<Integer> hijoder = new EDBinaryTree<Integer>(82, hijoderizq, c);
+		
+		EDBinaryTree<Integer> ab = new EDBinaryTree<Integer>();
+		ab = new EDBinaryTree<Integer>(44, hijoizq, hijoder);
+		System.out.println("-----çrbol utilizado--------");
+		ab.displayTree();                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          
+		System.out.println("----------------------------");
+		mostrarArbolMayorAMenor(ab);
+	}
+
+}

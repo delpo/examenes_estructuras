@@ -1,0 +1,13 @@
+package ej1;
+
+public class PairData implements Pair<K, V> {
+
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+
+	}
+
+}

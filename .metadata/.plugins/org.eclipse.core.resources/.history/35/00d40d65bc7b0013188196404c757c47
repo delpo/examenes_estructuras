@@ -1,0 +1,13 @@
+package ej4;
+
+public class Ejercicio {
+
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+
+	}
+
+}

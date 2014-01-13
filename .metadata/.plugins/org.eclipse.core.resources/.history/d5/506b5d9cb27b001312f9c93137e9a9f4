@@ -1,0 +1,23 @@
+package ej3;
+
+import java.util.LinkedList;
+
+public class GestorMemoria {
+	public int cantidad;
+	LinkedList<Bloque> memoria;
+	
+	public GestorMemoria(int cantidad){
+		this.cantidad = cantidad;
+		memoria = new LinkedList<Bloque>();
+		Bloque bloque_unico = new Bloque(0, cantidad-1);
+		memoria.add(bloque_unico);
+	}
+	
+	public int Reserva(int cantidad) throws ExcepcionMemoriaLlena{
+		int dirMemoria;
+		
+		return dirMemoria;
+		
+	}
+
+}

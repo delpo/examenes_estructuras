@@ -1,0 +1,18 @@
+package ej1;
+
+public class Test {
+
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		ChainHashTable<String, String> tabla = new ChainHashTable<String, String>(5); //tama–o inicial 5
+		Pair par = new PairData("1", "Martin Scorsese");
+		tabla.addEntry(par);
+		par = new PairData("2", "Robert De Niro");
+		tabla.addEntry(par);
+		par = new PairData("3", "Scarlett Johannson");
+		tabla.addEntry(par);
+	}
+
+}

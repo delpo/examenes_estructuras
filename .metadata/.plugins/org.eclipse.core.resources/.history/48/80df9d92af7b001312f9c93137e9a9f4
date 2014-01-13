@@ -1,0 +1,14 @@
+package ej3;
+
+import java.util.LinkedList;
+
+public class GestorMemoria {
+	public int cantidad;
+	LinkedList memoria;
+	
+	public GestorMemoria(int cantidad){
+		this.cantidad = cantidad;
+		memoria = new LinkedList<E>()
+	}
+
+}
